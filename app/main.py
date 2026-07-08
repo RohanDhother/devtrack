@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from app.routers import applications
 from app.database import engine, Base
 from app.routers import auth
+import pytest
 
 app = FastAPI(
     title="DevTrack",
@@ -13,9 +14,10 @@ app.include_router(applications.router)
 app.include_router(auth.router)
 
 
-@app.on_event("startup")
+@pytest.fixture(autouse=True)
 async def startup():
     async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
 
 
