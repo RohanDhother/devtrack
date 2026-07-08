@@ -1,13 +1,14 @@
 import pytest_asyncio
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from httpx import ASGITransport, AsyncClient
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlalchemy.pool import NullPool
-from httpx import AsyncClient, ASGITransport
 
-from app.main import app
+from app.config import get_settings
 from app.database import Base, get_db
+from app.main import app
 
-TEST_DATABASE_URL = "postgresql+asyncpg://rohan:dev_password@localhost:5432/devtrack_test"
-test_engine = create_async_engine(TEST_DATABASE_URL, poolclass=NullPool)
+settings = get_settings()
+test_engine = create_async_engine(settings.test_database_url, poolclass=NullPool)
 TestSessionLocal = async_sessionmaker(test_engine, expire_on_commit=False)
 
 

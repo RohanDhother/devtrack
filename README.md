@@ -27,12 +27,18 @@ practising modern Python async patterns.
 git clone https://github.com/RohanDhother/devtrack.git
 cd devtrack
 uv venv && source .venv/bin/activate
-uv sync
+uv sync --group dev
 alembic upgrade head
 uvicorn app.main:app --reload
 ```
 
 Then open http://localhost:8000/docs
+
+## Development Tips
+
+- Run the test suite with `pytest`
+- Format and lint with `ruff check .` and `ruff format .`
+- Keep configuration in environment variables where possible
 
 ## Status
 
