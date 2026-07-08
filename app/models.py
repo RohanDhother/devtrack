@@ -1,4 +1,4 @@
-from sqlalchemy import Integer, String, DateTime
+from sqlalchemy import Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 from datetime import datetime, timezone
 from app.database import Base
@@ -16,3 +16,12 @@ class Application(Base):
         default=lambda: datetime.now(timezone.utc)
     )
     notes: Mapped[str | None] = mapped_column(String, nullable=True)
+    # user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
+    password_hash: Mapped[str] = mapped_column(String(255))

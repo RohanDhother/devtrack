@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from app.routers import applications
 from app.database import engine, Base
+from app.routers import auth
 
 app = FastAPI(
     title="DevTrack",
@@ -9,6 +10,7 @@ app = FastAPI(
 )
 
 app.include_router(applications.router)
+app.include_router(auth.router)
 
 
 @app.on_event("startup")

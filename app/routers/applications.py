@@ -2,8 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.database import get_db
-from app.models import Application
+from app.models import Application, User
 from app.schemas import ApplicationCreate, ApplicationUpdate, ApplicationResponse
+from app.auth import get_current_user
 
 router = APIRouter(prefix="/applications", tags=["applications"])
 
@@ -24,7 +25,11 @@ async def get_application(application_id: int, db: AsyncSession = Depends(get_db
 
 
 @router.post("/", response_model=ApplicationResponse, status_code=201)
-async def create_application(payload: ApplicationCreate, db: AsyncSession = Depends(get_db)):
+async def create_application(
+    payload: ApplicationCreate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     application = Application(**payload.model_dump())
     db.add(application)
     await db.commit()
@@ -33,7 +38,12 @@ async def create_application(payload: ApplicationCreate, db: AsyncSession = Depe
 
 
 @router.patch("/{application_id}", response_model=ApplicationResponse)
-async def update_application(application_id: int, payload: ApplicationUpdate, db: AsyncSession = Depends(get_db)):
+async def update_application(
+    application_id: int,
+    payload: ApplicationUpdate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     result = await db.execute(select(Application).where(Application.id == application_id))
     application = result.scalar_one_or_none()
     if not application:
@@ -46,7 +56,11 @@ async def update_application(application_id: int, payload: ApplicationUpdate, db
 
 
 @router.delete("/{application_id}", status_code=204)
-async def delete_application(application_id: int, db: AsyncSession = Depends(get_db)):
+async def delete_application(
+    application_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     result = await db.execute(select(Application).where(Application.id == application_id))
     application = result.scalar_one_or_none()
     if not application:
