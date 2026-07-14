@@ -19,17 +19,13 @@ services:
     ports:
       - "8000:8000"
     environment:
-      DATABASE_URL: postgresql+asyncpg://rohan:dev_password@devtrack:5432/app
+      DATABASE_URL: postgresql+asyncpg://rohan:dev_password@db:5432/devtrack
     depends_on:
       db:
         condition: service_healthy
     volumes:
-      - ./main.py:/app/main.py
-      - ./database.py:/app/database.py
-      - ./auth.py:/app/auth.py
-      - ./schemas.py:/app/schemas.py
-      - ./alembic:/app/alembic
-      - ./alembic.ini:/app/alembic.ini
+      - .:/app
+      - /app/.venv
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
 volumes:

@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
 from app.models import Base
 import asyncio
+from app.config import get_settings
 
 
 config = context.config
@@ -11,12 +12,12 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 target_metadata = Base.metadata
+settings = get_settings()
 
 
 def run_migrations_offline() -> None:
-    url = config.get_main_option("sqlalchemy.url")
     context.configure(
-        url=url,
+        url=settings.database_url,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
@@ -26,8 +27,10 @@ def run_migrations_offline() -> None:
 
 
 async def run_migrations_online() -> None:
+    configuration = config.get_section(config.config_ini_section, {})
+    configuration["sqlalchemy.url"] = settings.database_url
     connectable = async_engine_from_config(
-        config.get_section(config.config_ini_section, {}),
+        configuration,
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
